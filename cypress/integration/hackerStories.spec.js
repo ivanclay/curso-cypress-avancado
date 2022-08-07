@@ -126,8 +126,8 @@ describe('Hacker Stories', () => {
         .should('be.visible')
     })
 
-    
-    it.only('types and submits the form directly', () => {
+    // TODO: Este teste está falhando => descobrir o problema.
+    it('types and submits the form directly', () => {
       cy.get('form input[type="text"]')
         .should('be.visible')
         .clear()
@@ -181,4 +181,42 @@ describe('Hacker Stories', () => {
       })
     })
   })
+//FIM DESCRIBE  
 })
+
+//FORA DO DESCRIBE
+
+    // Hrm, how would I simulate such errors?
+    // Since I still don't know, the tests are being skipped.
+    // TODO: Find a way to test them out.
+    context('Errors', () => {
+
+      it('shows "Something went wrong ..." in case of a server error', () => {
+        cy.intercept(
+          'GET',
+          '**/search**',
+          { statusCode: 500 }
+        ).as('getServerFailure')
+    
+        cy.visit('/')
+        cy.wait('@getServerFailure')
+        
+    
+        cy.get('p:contains(Something went wrong ...)')
+          .should('be.visible')
+      })
+  
+      it('shows "Something went wrong ..." in case of a network error', () => {
+        cy.intercept(
+          'GET',
+          '**/search**',
+          { forceNetworkError: true }
+        ).as('getNetworkFailure')
+    
+        cy.visit('/')
+        cy.wait('@getNetworkFailure')
+    
+        cy.get('p:contains(Something went wrong ...)')
+          .should('be.visible')
+      })
+    })
